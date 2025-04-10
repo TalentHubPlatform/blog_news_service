@@ -38,13 +38,7 @@ async def get_comment_replies(uow: UOWAlchemyDep, comment_id: int):
 
 @comment_router.post("/", response_model=int)
 async def create_comment(
-        uow: UOWAlchemyDep, comment: CommentCreate, current_user=Depends(get_current_user)
-):
-    if comment.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only create comments as yourself",
-        )
+        uow: UOWAlchemyDep, comment: CommentCreate):
 
     return await CommentService().create_comment(uow, comment)
 
@@ -53,56 +47,41 @@ async def create_comment(
 async def update_comment(
         uow: UOWAlchemyDep,
         comment_id: int,
-        comment: CommentUpdate,
-        current_user=Depends(get_current_user),
-):
+        comment: CommentUpdate):
     existing_comment = await CommentService().get_comment_by_id(uow, comment_id)
-
-    if current_user.role not in ["admin", "moderator"] and existing_comment.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only update your own comments",
-        )
 
     return await CommentService().update_comment(uow, comment_id, comment)
 
 
 @comment_router.delete("/{comment_id}", response_model=CommentSchema)
 async def delete_comment(
-        uow: UOWAlchemyDep, comment_id: int, current_user=Depends(get_current_user)
-):
+        uow: UOWAlchemyDep, comment_id: int):
     existing_comment = await CommentService().get_comment_by_id(uow, comment_id)
-
-    if current_user.role not in ["admin", "moderator"] and existing_comment.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only delete your own comments",
-        )
 
     return await CommentService().delete_comment(uow, comment_id)
 
 
-@comment_router.patch("/{comment_id}/approve", response_model=CommentSchema)
-async def approve_comment(
-        uow: UOWAlchemyDep, comment_id: int, current_user=Depends(get_current_user)
-):
-    if current_user.role not in ["admin", "moderator"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only moderators can approve comments",
-        )
+# @comment_router.patch("/{comment_id}/approve", response_model=CommentSchema)
+# async def approve_comment(
+#         uow: UOWAlchemyDep, comment_id: int, current_user=Depends(get_current_user)
+# ):
+#     if current_user.role not in ["admin", "moderator"]:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Only moderators can approve comments",
+#         )
+#
+#     return await CommentService().approve_comment(uow, comment_id)
 
-    return await CommentService().approve_comment(uow, comment_id)
 
-
-@comment_router.patch("/{comment_id}/reject", response_model=CommentSchema)
-async def reject_comment(
-        uow: UOWAlchemyDep, comment_id: int, current_user=Depends(get_current_user)
-):
-    if current_user.role not in ["admin", "moderator"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only moderators can reject comments",
-        )
-
-    return await CommentService().reject_comment(uow, comment_id)
+# @comment_router.patch("/{comment_id}/reject", response_model=CommentSchema)
+# async def reject_comment(
+#         uow: UOWAlchemyDep, comment_id: int, current_user=Depends(get_current_user)
+# ):
+#     if current_user.role not in ["admin", "moderator"]:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Only moderators can reject comments",
+#         )
+#
+#     return await CommentService().reject_comment(uow, comment_id)

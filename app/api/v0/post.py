@@ -1,7 +1,6 @@
 from typing import Optional, List, Dict, Any
 
 from app.api.dependencies import UOWAlchemyDep
-from app.core.auth import get_current_user
 from app.database.schemas.post import (
     PostCreate,
     PostUpdate,
@@ -57,13 +56,8 @@ async def get_posts_by_author(uow: UOWAlchemyDep, author_id: int):
 
 @post_router.post("/", response_model=int)
 async def create_post(
-    uow: UOWAlchemyDep, post: PostCreate, current_user=Depends(get_current_user)
-):
-    if current_user.role not in ["admin", "editor"] and post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only create posts as yourself",
-        )
+    uow: UOWAlchemyDep, post: PostCreate):
+
 
     return await PostService().create_post(uow, post)
 
@@ -73,119 +67,63 @@ async def update_post(
     uow: UOWAlchemyDep,
     post_id: int,
     post: PostUpdate,
-    current_user=Depends(get_current_user),
 ):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only update your own posts",
-        )
 
     return await PostService().update_post(uow, post_id, post)
 
 
 @post_router.delete("/{post_id}", response_model=PostSchema)
 async def delete_post(
-    uow: UOWAlchemyDep, post_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only delete your own posts",
-        )
 
     return await PostService().delete_post(uow, post_id)
 
 
 @post_router.patch("/{post_id}/publish", response_model=PostSchema)
 async def publish_post(
-    uow: UOWAlchemyDep, post_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only publish your own posts",
-        )
 
     return await PostService().publish_post(uow, post_id)
 
 
 @post_router.patch("/{post_id}/archive", response_model=PostSchema)
 async def archive_post(
-    uow: UOWAlchemyDep, post_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only archive your own posts",
-        )
 
     return await PostService().archive_post(uow, post_id)
 
 
 @post_router.post("/{post_id}/tags/{tag_id}", response_model=dict)
 async def add_tag_to_post(
-    uow: UOWAlchemyDep, post_id: int, tag_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int, tag_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only add tags to your own posts",
-        )
 
     return await PostService().add_tag_to_post(uow, post_id, tag_id)
 
 
 @post_router.delete("/{post_id}/tags/{tag_id}", response_model=dict)
 async def remove_tag_from_post(
-    uow: UOWAlchemyDep, post_id: int, tag_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int, tag_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only remove tags from your own posts",
-        )
 
     return await PostService().remove_tag_from_post(uow, post_id, tag_id)
 
 
 @post_router.post("/{post_id}/categories/{category_id}", response_model=dict)
 async def add_category_to_post(
-    uow: UOWAlchemyDep, post_id: int, category_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int, category_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only add categories to your own posts",
-        )
 
     return await PostService().add_category_to_post(uow, post_id, category_id)
 
 
 @post_router.delete("/{post_id}/categories/{category_id}", response_model=dict)
 async def remove_category_from_post(
-    uow: UOWAlchemyDep, post_id: int, category_id: int, current_user=Depends(get_current_user)
-):
+    uow: UOWAlchemyDep, post_id: int, category_id: int):
     existing_post = await PostService().get_post_by_id(uow, post_id)
-
-    if current_user.role not in ["admin", "editor"] and existing_post.author_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only remove categories from your own posts",
-        )
 
     return await PostService().remove_category_from_post(uow, post_id, category_id)
