@@ -32,9 +32,9 @@
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: admin
       volumes:
-        -  fucking_slaves:/var/lib/postgresql/data
+        -  placeholder:/var/lib/postgresql/data
       ports:
         - "5433:5432"
 
   volumes:
-     fucking_slaves:
+     placeholder:
