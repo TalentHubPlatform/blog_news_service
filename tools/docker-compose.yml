@@ -26,16 +26,15 @@
         - "blog_service_db"
 
     blog_service_db:
-      image: postgres:13
+      image: postgres
       restart: always
       environment:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: admin
-        POSTGRES_DB: blog_db
       volumes:
-        - blog_postgres_data:/var/lib/postgresql/data
+        -  placeholder:/var/lib/postgresql/data
       ports:
         - "5433:5432"
 
   volumes:
-    blog_postgres_data:
+     placeholder:

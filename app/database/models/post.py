@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, Enum, Integer
+from sqlalchemy import Column, String, Text, DateTime, Enum, Integer
 from sqlalchemy.orm import relationship
 import enum
 
@@ -28,9 +28,8 @@ class Post(BaseModel):
     status = Column(Enum(PostStatus), nullable=False, default=PostStatus.DRAFT)
     publication_date = Column(DateTime, nullable=True)
 
-    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    author_id = Column(Integer, nullable=False)
 
-    author = relationship("User", backref="posts")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
     tags = relationship("Tag", secondary="posts_tags", back_populates="posts")
     categories = relationship("Category", secondary="posts_categories", back_populates="posts")

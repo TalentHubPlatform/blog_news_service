@@ -1,4 +1,4 @@
-from core.utils.repository import CachedRepository
+from app.core.utils.repository import CachedRepository
 from app.database.models.tag import Tag
 
 

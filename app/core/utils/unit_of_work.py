@@ -60,15 +60,13 @@ class CachedSQLAlchemyUnitOfWork(AbstractUnitOfWork):
     async def __aenter__(self):
         self.session: AsyncSession = await anext(self.session_factory())
 
-        # Import repository classes only when needed
-        from blog_service.app.repositories.post import PostRepository
-        from blog_service.app.repositories.comment import CommentRepository
-        from blog_service.app.repositories.tag import TagRepository
-        from blog_service.app.repositories.post_tag import PostTagRepository
-        from blog_service.app.repositories.category import CategoryRepository
-        from blog_service.app.repositories.post_category import PostCategoryRepository
+        from app.repositories.post import PostRepository
+        from app.repositories.comment import CommentRepository
+        from app.repositories.tag import TagRepository
+        from app.repositories.post_tag import PostTagRepository
+        from app.repositories.category import CategoryRepository
+        from app.repositories.post_category import PostCategoryRepository
 
-        # Initialize repositories
         self.posts = self.get_repository(PostRepository)
         self.comments = self.get_repository(CommentRepository)
         self.tags = self.get_repository(TagRepository)

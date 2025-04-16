@@ -1,7 +1,6 @@
-from typing import List, Optional
+from typing import List
 
 from app.api.dependencies import UOWAlchemyDep
-from app.core.auth import get_current_user
 from app.database.schemas.tag import (
     TagCreate,
     TagUpdate,
@@ -51,14 +50,7 @@ async def get_posts_by_tag(uow: UOWAlchemyDep, tag_id: int):
 
 
 @tag_router.post("/", response_model=int)
-async def create_tag(
-    uow: UOWAlchemyDep, tag: TagCreate, current_user=Depends(get_current_user)
-):
-    if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only editors can create tags",
-        )
+async def create_tag(uow: UOWAlchemyDep, tag: TagCreate):
 
     return await TagService().create_tag(uow, tag)
 
@@ -67,26 +59,13 @@ async def create_tag(
 async def update_tag(
     uow: UOWAlchemyDep,
     tag_id: int,
-    tag: TagUpdate,
-    current_user=Depends(get_current_user),
+    tag: TagUpdate
 ):
-    if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only editors can update tags",
-        )
 
     return await TagService().update_tag(uow, tag_id, tag)
 
 
 @tag_router.delete("/{tag_id}", response_model=TagSchema)
-async def delete_tag(
-    uow: UOWAlchemyDep, tag_id: int, current_user=Depends(get_current_user)
-):
-    if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only editors can delete tags",
-        )
+async def delete_tag(uow: UOWAlchemyDep, tag_id: int):
 
     return await TagService().delete_tag(uow, tag_id)

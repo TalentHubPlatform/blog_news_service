@@ -1,7 +1,6 @@
-from typing import List, Optional
+from typing import List
 
 from app.api.dependencies import UOWAlchemyDep
-from app.core.auth import get_current_user
 from app.database.schemas.category import (
     CategoryCreate,
     CategoryUpdate,
@@ -50,13 +49,7 @@ async def get_posts_by_category(uow: UOWAlchemyDep, category_id: int):
 
 @category_router.post("/", response_model=int)
 async def create_category(
-    uow: UOWAlchemyDep, category: CategoryCreate, current_user=Depends(get_current_user)
-):
-    if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only editors can create categories",
-        )
+    uow: UOWAlchemyDep, category: CategoryCreate):
 
     return await CategoryService().create_category(uow, category)
 
@@ -65,26 +58,13 @@ async def create_category(
 async def update_category(
     uow: UOWAlchemyDep,
     category_id: int,
-    category: CategoryUpdate,
-    current_user=Depends(get_current_user),
+    category: CategoryUpdate
 ):
-    if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only editors can update categories",
-        )
-
     return await CategoryService().update_category(uow, category_id, category)
 
 
 @category_router.delete("/{category_id}", response_model=CategorySchema)
 async def delete_category(
-    uow: UOWAlchemyDep, category_id: int, current_user=Depends(get_current_user)
+    uow: UOWAlchemyDep, category_id: int
 ):
-    if current_user.role not in ["admin", "editor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only editors can delete categories",
-        )
-
     return await CategoryService().delete_category(uow, category_id)
